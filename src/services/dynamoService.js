@@ -14,7 +14,7 @@ import {
 import { ENV } from '../config/env.js';
 
 const client = new DynamoDBClient({
-  region: ENV.AWS_REGION,
+  region: ENV.APP_AWS_REGION,
 });
 
 const dynamo =

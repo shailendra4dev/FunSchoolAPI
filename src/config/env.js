@@ -1,4 +1,4 @@
 export const ENV = {
   TABLE_NAME: process.env.TABLE_NAME,
-  AWS_REGION: process.env.AWS_REGION,
+  APP_AWS_REGION: process.env.APP_AWS_REGION,
 };
