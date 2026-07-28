@@ -12,32 +12,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout source code
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # Install Node.js
       - name: Setup Node.js 24
         uses: actions/setup-node@v4
         with:
           node-version: 24
+          cache: npm
 
+      # Verify Node version
       - name: Verify Node Version
         run: node -v
 
+      # Install zip utility
       - name: Install ZIP Utility
         run: sudo apt-get update && sudo apt-get install -y zip
 
+      # Install dependencies
       - name: Install Dependencies
         run: npm ci
 
-      - name: Remove Old ZIP
-        run: rm -f function.zip
+      - name: Package Lambda
+        run: npm run package
 
-      - name: Create ZIP Package
+      # Verify ZIP file
+      - name: Verify Package
         run: |
-          zip -r function.zip . \
-          -x "*.git*" \
-          -x ".github/*"
+          ls -lh build
+          unzip -l build/lambda.zip | head -50
 
+      # Configure AWS credentials
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -45,22 +52,24 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      # Deploy all Lambda functions
       - name: Deploy All Lambda Functions
         env:
           FUNCTIONS: "createTodo getTodos getTodoById updateTodo deleteTodo"
+
         run: |
           for FUNCTION in $FUNCTIONS
           do
-            echo "======================================"
-            echo "Deploying: $FUNCTION"
-            echo "======================================"
+            echo "=========================================="
+            echo "Deploying $FUNCTION..."
+            echo "=========================================="
 
             aws lambda update-function-code \
               --function-name "$FUNCTION" \
-              --zip-file fileb://function.zip
+              --zip-file fileb://build/lambda.zip
 
-            echo "Successfully deployed $FUNCTION"
+            echo "✅ Successfully deployed $FUNCTION"
           done
 
       - name: Deployment Success
-        run: echo "All Lambda functions deployed successfully."
+        run: echo "🎉 All Lambda functions deployed successfully!"
