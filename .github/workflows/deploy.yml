@@ -38,9 +38,21 @@ jobs:
       - name: Build Lambda
         run: npm run build
 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.12.2
+
+      - name: Verify Terraform Version
+        run: terraform version
+
       - name: Terraform Init
         working-directory: terraform
         run: terraform init
+
+      - name: Terraform Plan
+        working-directory: terraform
+        run: terraform plan
 
       - name: Terraform Apply
         working-directory: terraform
