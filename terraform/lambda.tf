@@ -10,21 +10,33 @@ locals {
 
 }
 
+data "archive_file" "lambda_zip" {
+
+  for_each = toset(local.lambda_functions)
+
+  type = "zip"
+
+  source_file = "${path.module}/../dist/${each.value}.js"
+
+  output_path = "${path.module}/../dist/${each.value}.zip"
+
+}
+
 resource "aws_lambda_function" "todos" {
 
   for_each = toset(local.lambda_functions)
 
   function_name = "${local.name_prefix}-${each.value}"
 
-  filename = "${path.module}/../build/lambda.zip"
+  filename = data.archive_file.lambda_zip[each.key].output_path
 
-  source_code_hash = filebase64sha256("${path.module}/../build/lambda.zip")
+  source_code_hash = data.archive_file.lambda_zip[each.key].output_base64sha256
 
   role = aws_iam_role.lambda_role.arn
 
   runtime = "nodejs24.x"
 
-  handler = "src/handlers/${each.value}.handler"
+  handler = "${each.value}.handler"
 
   timeout = 10
 

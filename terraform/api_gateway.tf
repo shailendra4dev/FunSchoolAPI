@@ -34,41 +34,95 @@ resource "aws_api_gateway_resource" "todo_id" {
 
 }
 
-resource "aws_api_gateway_method" "create_todo" {
+locals {
+
+  api_methods = {
+
+    createTodo = {
+
+      resource = aws_api_gateway_resource.todos.id
+
+      method = "POST"
+
+    }
+
+    getTodos = {
+
+      resource = aws_api_gateway_resource.todos.id
+
+      method = "GET"
+
+    }
+
+    getTodoById = {
+
+      resource = aws_api_gateway_resource.todo_id.id
+
+      method = "GET"
+
+    }
+
+    updateTodo = {
+
+      resource = aws_api_gateway_resource.todo_id.id
+
+      method = "PUT"
+
+    }
+
+    deleteTodo = {
+
+      resource = aws_api_gateway_resource.todo_id.id
+
+      method = "DELETE"
+
+    }
+
+  }
+
+}
+
+resource "aws_api_gateway_method" "todos" {
+
+  for_each = local.api_methods
 
   rest_api_id = aws_api_gateway_rest_api.todo_api.id
 
-  resource_id = aws_api_gateway_resource.todos.id
+  resource_id = each.value.resource
 
-  http_method = "POST"
+  http_method = each.value.method
 
   authorization = "NONE"
 
 }
 
-resource "aws_api_gateway_integration" "create_todo" {
+resource "aws_api_gateway_integration" "todos" {
+
+  for_each = local.api_methods
 
   rest_api_id = aws_api_gateway_rest_api.todo_api.id
 
-  resource_id = aws_api_gateway_resource.todos.id
+  resource_id = each.value.resource
 
-  http_method = aws_api_gateway_method.create_todo.http_method
+  http_method = aws_api_gateway_method.todos[each.key].http_method
 
   integration_http_method = "POST"
 
   type = "AWS_PROXY"
 
-  uri = aws_lambda_function.todos["createTodo"].invoke_arn
+  uri = aws_lambda_function.todos[each.key].invoke_arn
 
 }
 
-resource "aws_lambda_permission" "api_gateway_create" {
+resource "aws_lambda_permission" "api_gateway" {
 
-  statement_id = "AllowExecutionFromAPIGateway"
+  for_each = local.api_methods
+
+  statement_id = "AllowExecution-${each.key}"
 
   action = "lambda:InvokeFunction"
 
-  function_name = aws_lambda_function.todos["createTodo"].function_name
+  function_name = aws_lambda_function.todos[each.key].function_name
 
   principal = "apigateway.amazonaws.com"
 
@@ -80,12 +134,22 @@ resource "aws_api_gateway_deployment" "deployment" {
 
   rest_api_id = aws_api_gateway_rest_api.todo_api.id
 
+  triggers = {
+    redeployment = sha1(jsonencode([
+      aws_api_gateway_resource.todos.id,
+      aws_api_gateway_resource.todo_id.id,
+      aws_api_gateway_method.todos,
+      aws_api_gateway_integration.todos
+    ]))
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
   depends_on = [
-
-    aws_api_gateway_integration.create_todo
-
+    aws_api_gateway_integration.todos
   ]
-
 }
 
 resource "aws_api_gateway_stage" "dev" {
@@ -99,4 +163,3 @@ resource "aws_api_gateway_stage" "dev" {
   tags = local.common_tags
 
 }
-

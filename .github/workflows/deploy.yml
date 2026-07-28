@@ -35,8 +35,11 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Package Lambda
-        run: npm run package
+      - name: Build Lambdas
+        run: node scripts/build.js
+
+      - name: Package Lambdas
+        run: node scripts/package.js
 
       # Verify ZIP file
       - name: Verify Package

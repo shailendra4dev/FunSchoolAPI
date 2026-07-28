@@ -8,7 +8,8 @@
     "uuid": "^11.1.0"
   },
   "scripts": {
-    "package": "node scripts/package.js"
+    "package": "node scripts/package.js",
+    "build": "node scripts/build.js"
   },
   "engines": {
     "node": ">=24"

@@ -3,9 +3,10 @@ FunSchoolAPI
 
 # Commands
 ## Local
-npm run package
+root => npm run build
 
-terraform fmt
-terraform validate
-terraform plan
-terraform apply
+terraform =>
+    terraform fmt
+    terraform validate
+    terraform plan
+    terraform apply
