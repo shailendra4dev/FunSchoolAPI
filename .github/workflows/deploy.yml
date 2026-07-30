@@ -1,4 +1,4 @@
-name: Deploy Lambda
+name: Deploy AWS Infrastructure
 
 on:
   push:
@@ -9,39 +9,61 @@ on:
 
 jobs:
   deploy:
+
     runs-on: ubuntu-latest
+
     timeout-minutes: 30
 
+    defaults:
+      run:
+        working-directory: terraform
+
     steps:
-      # Checkout source code
+
+      #--------------------------------------------
+      # Checkout Repository
+      #--------------------------------------------
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # Install Node.js
-      - name: Setup Node.js 24
+      #--------------------------------------------
+      # Setup Node.js
+      #--------------------------------------------
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
 
-      # Verify Node version
       - name: Verify Node Version
         run: node -v
+        working-directory: .
 
-      # Install zip utility
-      - name: Install ZIP Utility
-        run: sudo apt-get update && sudo apt-get install -y zip
-
-      # Install dependencies
+      #--------------------------------------------
+      # Install Dependencies
+      #--------------------------------------------
       - name: Install Dependencies
         run: npm ci
+        working-directory: .
 
-      - name: Build Lambda
+      #--------------------------------------------
+      # Build Lambda Functions
+      #--------------------------------------------
+      - name: Build Lambda Functions
         run: npm run build
+        working-directory: .
 
-      - name: Verify AWS Identity
-        run: aws sts get-caller-identity
+      #--------------------------------------------
+      # Verify Build Output
+      #--------------------------------------------
+      - name: Verify Build
+        run: |
+          ls -la dist
+        working-directory: .
 
+      #--------------------------------------------
+      # Setup Terraform
+      #--------------------------------------------
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -50,28 +72,9 @@ jobs:
       - name: Verify Terraform Version
         run: terraform version
 
-      - name: Terraform Init
-        working-directory: terraform
-        run: terraform init
-
-      - name: Terraform Plan
-        working-directory: terraform
-        env:
-          TF_INPUT: "false"
-          TF_LOG: DEBUG
-        run: terraform plan -no-color
-
-      - name: Terraform Apply
-        working-directory: terraform
-        run: terraform apply -auto-approve
-
-      # Verify ZIP file
-      - name: Verify Package
-        run: |
-          ls -lh build
-          unzip -l build/lambda.zip | head -50
-
-      # Configure AWS credentials
+      #--------------------------------------------
+      # Configure AWS Credentials
+      #--------------------------------------------
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -79,24 +82,46 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      # Deploy all Lambda functions
-      - name: Deploy All Lambda Functions
+      #--------------------------------------------
+      # Verify AWS Login
+      #--------------------------------------------
+      - name: Verify AWS Identity
+        run: aws sts get-caller-identity
+
+      #--------------------------------------------
+      # Terraform Init
+      #--------------------------------------------
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      #--------------------------------------------
+      # Terraform Format Check
+      #--------------------------------------------
+      - name: Terraform Format
+        run: terraform fmt -check
+
+      #--------------------------------------------
+      # Terraform Validate
+      #--------------------------------------------
+      - name: Terraform Validate
+        run: terraform validate
+
+      #--------------------------------------------
+      # Terraform Plan
+      #--------------------------------------------
+      - name: Terraform Plan
         env:
-          FUNCTIONS: "createTodo getTodos getTodoById updateTodo deleteTodo"
+          TF_INPUT: "false"
+        run: terraform plan -input=false -no-color -out=tfplan
 
-        run: |
-          for FUNCTION in $FUNCTIONS
-          do
-            echo "=========================================="
-            echo "Deploying $FUNCTION..."
-            echo "=========================================="
+      #--------------------------------------------
+      # Terraform Apply
+      #--------------------------------------------
+      - name: Terraform Apply
+        run: terraform apply -input=false -auto-approve tfplan
 
-            aws lambda update-function-code \
-              --function-name "$FUNCTION" \
-              --zip-file fileb://build/lambda.zip
-
-            echo "✅ Successfully deployed $FUNCTION"
-          done
-
-      - name: Deployment Success
-        run: echo "🎉 All Lambda functions deployed successfully!"
+      #--------------------------------------------
+      # Deployment Complete
+      #--------------------------------------------
+      - name: Deployment Complete
+        run: echo "Deployment completed successfully."
