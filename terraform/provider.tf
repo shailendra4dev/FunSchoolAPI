@@ -1,24 +1,25 @@
-provider "aws" {
+terraform {
 
-  region = var.aws_region
+  required_version = ">= 1.6"
+
+  backend "s3" {}
+
+  required_providers {
+
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 6.0"
+    }
+
+    archive = {
+      source  = "hashicorp/archive"
+      version = "~> 2.7"
+    }
+
+  }
 
 }
 
-terraform {
-
-  required_version = ">=1.6"
-
-  backend "s3" {
-
-    bucket = "funschoolapi-terraform-state-846511227413"
-
-    key = "dev/terraform.tfstate"
-
-    region = "ap-south-1"
-
-    dynamodb_table = "terraform-lock"
-
-    encrypt = true
-
-  }
+provider "aws" {
+  region = var.aws_region
 }
