@@ -1,7 +1,7 @@
-aws_region   = "ap-south-1"
+aws_region = "ap-south-1"
 
-environment  = "prod"
+environment = "prod"
 
 project_name = "todo-api"
 
-owner         = "Shailendra"
+owner = "Shailendra"
