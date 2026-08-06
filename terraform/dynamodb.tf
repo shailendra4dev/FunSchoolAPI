@@ -1,6 +1,6 @@
-resource "aws_dynamodb_table" "todos" {
+resource "aws_dynamodb_table" "posts" {
 
-  name = "${local.name_prefix}-todos"
+  name = "${local.name_prefix}-posts"
 
   billing_mode = "PAY_PER_REQUEST"
 

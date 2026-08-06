@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 
 import {
-  createTodo,
+  createPost,
 } from '../services/dynamoService.js';
 
 import { response } from '../utils/response.js';
@@ -19,7 +19,7 @@ export const handler = async (event) => {
     };
 
     const savedItem =
-      await createTodo(item);
+      await createPost(item);
 
     return response(201, {
       success: true,

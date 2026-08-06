@@ -1,5 +1,5 @@
 import {
-  getTodoById,
+  getPostById,
 } from '../services/dynamoService.js';
 
 import { response } from '../utils/response.js';
@@ -11,12 +11,12 @@ export const handler = async (event) => {
       event.pathParameters.id;
 
     const item =
-      await getTodoById(id);
+      await getPostById(id);
 
     if (!item) {
       return response(404, {
         success: false,
-        message: 'Todo not found',
+        message: 'Post not found',
       });
     }
 

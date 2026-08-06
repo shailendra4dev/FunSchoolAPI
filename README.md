@@ -10,3 +10,6 @@ terraform =>
     terraform validate
     terraform plan
     terraform apply
+
+## Github Actions
+Run Deploy or Destroy workflow

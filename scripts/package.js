@@ -1,11 +1,11 @@
 import { execSync } from "node:child_process";
 
 const handlers = [
-  "createTodo",
-  "getTodos",
-  "getTodoById",
-  "updateTodo",
-  "deleteTodo"
+  "createPost",
+  "getPosts",
+  "getPostById",
+  "updatePost",
+  "deletePost"
 ];
 
 for (const handler of handlers) {

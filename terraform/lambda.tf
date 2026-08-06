@@ -1,11 +1,11 @@
 locals {
 
   lambda_functions = [
-    "createTodo",
-    "getTodos",
-    "getTodoById",
-    "updateTodo",
-    "deleteTodo"
+    "createPost",
+    "getPosts",
+    "getPostById",
+    "updatePost",
+    "deletePost"
   ]
 
 }
@@ -22,7 +22,7 @@ data "archive_file" "lambda_zip" {
 
 }
 
-resource "aws_lambda_function" "todos" {
+resource "aws_lambda_function" "posts" {
 
   for_each = toset(local.lambda_functions)
 
@@ -46,7 +46,7 @@ resource "aws_lambda_function" "todos" {
 
     variables = {
 
-      TABLE_NAME = aws_dynamodb_table.todos.name
+      TABLE_NAME = aws_dynamodb_table.posts.name
 
       APP_AWS_REGION = var.aws_region
 
@@ -58,10 +58,10 @@ resource "aws_lambda_function" "todos" {
 
 }
 
-resource "aws_cloudwatch_log_group" "todos" {
+resource "aws_cloudwatch_log_group" "posts" {
   for_each = toset(local.lambda_functions)
 
-  name              = "/aws/lambda/${aws_lambda_function.todos[each.key].function_name}"
+  name              = "/aws/lambda/${aws_lambda_function.posts[each.key].function_name}"
   retention_in_days = 14
 
   tags = local.common_tags

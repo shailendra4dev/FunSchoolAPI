@@ -1,5 +1,5 @@
 import {
-  updateTodo,
+  deletePost,
 } from '../services/dynamoService.js';
 
 import { response } from '../utils/response.js';
@@ -10,19 +10,11 @@ export const handler = async (event) => {
     const id =
       event.pathParameters.id;
 
-    const body =
-      JSON.parse(event.body);
-
-    const updated =
-      await updateTodo(
-        id,
-        body.post,
-        body.author
-      );
+    await deletePost(id);
 
     return response(200, {
       success: true,
-      data: updated,
+      message: 'Post deleted',
     });
 
   } catch (error) {

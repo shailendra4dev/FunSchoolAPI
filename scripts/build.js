@@ -2,11 +2,11 @@ import { build } from "esbuild";
 import fs from "node:fs";
 
 const handlers = [
-  "createTodo",
-  "getTodos",
-  "getTodoById",
-  "updateTodo",
-  "deleteTodo"
+  "createPost",
+  "getPosts",
+  "getPostById",
+  "updatePost",
+  "deletePost"
 ];
 
 // Clean dist folder

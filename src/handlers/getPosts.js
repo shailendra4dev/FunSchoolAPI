@@ -1,5 +1,5 @@
 import {
-  getTodos,
+  getPosts,
 } from '../services/dynamoService.js';
 
 import { response } from '../utils/response.js';
@@ -7,7 +7,7 @@ import { response } from '../utils/response.js';
 export const handler = async () => {
   try {
 
-    const items = await getTodos();
+    const items = await getPosts();
 
     return response(200, {
       success: true,

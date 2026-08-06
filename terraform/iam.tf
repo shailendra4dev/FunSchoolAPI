@@ -49,7 +49,7 @@ data "aws_iam_policy_document" "lambda_permissions" {
     ]
 
     resources = [
-      aws_dynamodb_table.todos.arn
+      aws_dynamodb_table.posts.arn
     ]
 
   }

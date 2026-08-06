@@ -2,6 +2,6 @@ aws_region = "ap-south-1"
 
 environment = "dev"
 
-project_name = "todo-api"
+project_name = "post-api"
 
 owner = "Shailendra"

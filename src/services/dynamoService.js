@@ -20,7 +20,7 @@ const client = new DynamoDBClient({
 const dynamo =
   DynamoDBDocumentClient.from(client);
 
-export const createTodo = async (item) => {
+export const createPost = async (item) => {
   await dynamo.send(
     new PutCommand({
       TableName: ENV.TABLE_NAME,
@@ -31,7 +31,7 @@ export const createTodo = async (item) => {
   return item;
 };
 
-export const getTodos = async () => {
+export const getPosts = async () => {
   const response = await dynamo.send(
     new ScanCommand({
       TableName: ENV.TABLE_NAME,
@@ -41,7 +41,7 @@ export const getTodos = async () => {
   return response.Items || [];
 };
 
-export const getTodoById = async (id) => {
+export const getPostById = async (id) => {
   const response = await dynamo.send(
     new GetCommand({
       TableName: ENV.TABLE_NAME,
@@ -52,7 +52,7 @@ export const getTodoById = async (id) => {
   return response.Item;
 };
 
-export const updateTodo = async (
+export const updatePost = async (
   id,
   post,
   author
@@ -77,7 +77,7 @@ export const updateTodo = async (
   return response.Attributes;
 };
 
-export const deleteTodo = async (id) => {
+export const deletePost = async (id) => {
   await dynamo.send(
     new DeleteCommand({
       TableName: ENV.TABLE_NAME,

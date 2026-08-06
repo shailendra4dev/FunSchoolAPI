@@ -9,7 +9,7 @@ output "lambda_role_arn" {
 output "lambda_names" {
 
   value = [
-    for lambda in aws_lambda_function.todos :
+    for lambda in aws_lambda_function.posts :
     lambda.function_name
   ]
 
