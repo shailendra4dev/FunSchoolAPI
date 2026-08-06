@@ -16,8 +16,8 @@ export const handler = async (event) => {
     const updated =
       await updateTodo(
         id,
-        body.title,
-        body.name
+        body.post,
+        body.author
       );
 
     return response(200, {

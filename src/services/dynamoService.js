@@ -54,8 +54,8 @@ export const getTodoById = async (id) => {
 
 export const updateTodo = async (
   id,
-  title,
-  name
+  post,
+  author
 ) => {
   const response = await dynamo.send(
     new UpdateCommand({
@@ -63,11 +63,11 @@ export const updateTodo = async (
       Key: { id },
 
       UpdateExpression:
-        'SET title = :title, name = :name',
+        'SET post = :post, author = :author',
 
       ExpressionAttributeValues: {
-        ':title': title,
-        ':name': name,
+        ':post': post,
+        ':author': author,
       },
 
       ReturnValues: 'ALL_NEW',

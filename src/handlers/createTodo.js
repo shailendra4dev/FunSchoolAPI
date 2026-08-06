@@ -13,8 +13,8 @@ export const handler = async (event) => {
 
     const item = {
       id: uuid(),
-      title: body.title,
-      name: body.name,
+      post: body.post,
+      author: body.author,
       createdAt: new Date().toISOString(),
     };
 
