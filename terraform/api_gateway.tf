@@ -124,7 +124,7 @@ resource "aws_api_gateway_method_response" "posts_options" {
 
   response_parameters = {
 
-    "method.response.header.Access-Control-Allow-Origin"  = true
+    "method.response.header.Access-Control-Allow-Origin" = true
 
     "method.response.header.Access-Control-Allow-Headers" = true
 
@@ -206,7 +206,7 @@ resource "aws_api_gateway_method_response" "post_id_options" {
 
   response_parameters = {
 
-    "method.response.header.Access-Control-Allow-Origin"  = true
+    "method.response.header.Access-Control-Allow-Origin" = true
 
     "method.response.header.Access-Control-Allow-Headers" = true
 
@@ -299,20 +299,20 @@ resource "aws_api_gateway_deployment" "deployment" {
   rest_api_id = aws_api_gateway_rest_api.post_api.id
 
   triggers = {
-  redeployment = sha1(jsonencode([
-    aws_api_gateway_resource.posts.id,
-    aws_api_gateway_resource.post_id.id,
+    redeployment = sha1(jsonencode([
+      aws_api_gateway_resource.posts.id,
+      aws_api_gateway_resource.post_id.id,
 
-    aws_api_gateway_method.posts,
-    aws_api_gateway_integration.posts,
+      aws_api_gateway_method.posts,
+      aws_api_gateway_integration.posts,
 
-    aws_api_gateway_method.posts_options,
-    aws_api_gateway_integration.posts_options,
+      aws_api_gateway_method.posts_options,
+      aws_api_gateway_integration.posts_options,
 
-    aws_api_gateway_method.post_id_options,
-    aws_api_gateway_integration.post_id_options
-  ]))
-}
+      aws_api_gateway_method.post_id_options,
+      aws_api_gateway_integration.post_id_options
+    ]))
+  }
 
   lifecycle {
     create_before_destroy = true
