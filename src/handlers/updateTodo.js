@@ -17,7 +17,7 @@ export const handler = async (event) => {
       await updateTodo(
         id,
         body.title,
-        body.completed
+        body.name
       );
 
     return response(200, {

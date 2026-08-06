@@ -14,7 +14,7 @@ export const handler = async (event) => {
     const item = {
       id: uuid(),
       title: body.title,
-      completed: false,
+      name: body.name,
       createdAt: new Date().toISOString(),
     };
 
