@@ -1,0 +1,58 @@
+name: Destroy AWS Infrastructure
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to destroy"
+        required: true
+        type: choice
+        options:
+          - dev
+          - prod
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: terraform
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+        working-directory: .
+
+      - run: npm run build
+        working-directory: .
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Select Environment
+        run: |
+          if [ "${{ github.event.inputs.environment }}" = "prod" ]; then
+            echo "BACKEND=backend-prod.hcl" >> $GITHUB_ENV
+            echo "TFVARS=prod.tfvars" >> $GITHUB_ENV
+          else
+            echo "BACKEND=backend-dev.hcl" >> $GITHUB_ENV
+            echo "TFVARS=dev.tfvars" >> $GITHUB_ENV
+          fi
+
+      - name: Terraform Init
+        run: terraform init -backend-config=$BACKEND
+
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve -var-file=$TFVARS
